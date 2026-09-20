@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>CLARUS Speech Recording</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <div id="app" class="wrap">
+
+    <!-- SCREEN 1: Setup -->
+    <section id="screen-setup" class="screen active">
+      <h1>CLARUS Speech Recording</h1>
+
+      <div class="project-intro">
+        <p><strong>What is CLARUS?</strong> CLARUS is a final-year B.Tech research project studying <em>fairness</em> in AI-based lip-reading (visual speech recognition) systems &mdash; that is, whether these systems work equally well for everyone, regardless of skin tone, facial hair, lighting, or head angle.</p>
+        <p><strong>Why we're collecting this data:</strong> Most existing lip-reading datasets come from narrow sources (mainly BBC/TED footage) that don't represent how diverse real speakers actually look. To properly test and improve fairness, we need our own diverse set of recordings &mdash; that's where you come in.</p>
+        <p><strong>Why your contribution matters:</strong> Every recording directly helps us measure and reduce bias in this technology. Your data will only be used for this academic research project, as described in the consent notice below.</p>
+      </div>
+
+      <p class="sub">You'll record 5 short sentences, one at a time. Each recording is capped at 12 seconds and includes a short countdown first.</p>
+
+      <label for="fullName">Full name</label>
+      <input id="fullName" type="text" placeholder="e.g. Arun Kumar" autocomplete="off" />
+
+      <label for="rollNo">Roll number</label>
+      <input id="rollNo" type="text" placeholder="e.g. 23CU0320068" autocomplete="off" />
+
+      <label for="skinTone">How would you describe your skin tone? <span class="hint">(self-reported, used only for research fairness analysis)</span></label>
+      <select id="skinTone">
+        <option value="">Select one</option>
+        <option value="very_light">Very light</option>
+        <option value="light">Light</option>
+        <option value="medium">Medium</option>
+        <option value="tan">Tan</option>
+        <option value="brown">Brown</option>
+        <option value="dark">Dark</option>
+      </select>
+
+      <label for="gender">Gender <span class="hint">(self-reported)</span></label>
+      <select id="gender">
+        <option value="">Select one</option>
+        <option value="F">Female</option>
+        <option value="M">Male</option>
+        <option value="other">Other / prefer to self-describe</option>
+      </select>
+
+      <div class="consent">
+        <label class="checkbox-row">
+          <input type="checkbox" id="consent" />
+          <span>I agree to have my video recorded for this academic research project (CLARUS). I understand it will be used to train and test a lip-reading AI system, will not be shared publicly or used anywhere else, and is being collected only for this college research project.</span>
+        </label>
+      </div>
+
+      <button id="btnStart" class="primary" disabled>Start Recording</button>
+      <p id="setupError" class="error"></p>
+    </section>
+
+    <!-- SCREEN 2: Camera permission / preview check -->
+    <section id="screen-camera-check" class="screen">
+      <h2>Camera check</h2>
+      <p class="sub">Make sure your face is clearly visible, well-lit, and that only you are in frame. The checklist below must all turn green before you can continue.</p>
+      <video id="previewVideo" autoplay muted playsinline></video>
+
+      <div class="quality-checklist">
+        <div id="checkPerson" class="check-item pending"><span class="dot"></span> Exactly one person in frame</div>
+        <div id="checkLight" class="check-item pending"><span class="dot"></span> Lighting is adequate</div>
+        <div id="checkStable" class="check-item pending"><span class="dot"></span> Face is steady (not moving)</div>
+      </div>
+
+      <p id="cameraError" class="error"></p>
+      <button id="btnReady" class="primary" disabled>Start Sentence 1</button>
+    </section>
+
+    <!-- SCREEN 3: Recording flow -->
+    <section id="screen-record" class="screen">
+      <div class="progress-row">
+        <span id="progressLabel">Sentence 1 of 5</span>
+        <div class="progress-bar"><div id="progressFill" class="progress-fill"></div></div>
+      </div>
+
+      <div class="sentence-card">
+        <p id="sentenceText" class="sentence-text"></p>
+      </div>
+
+      <div class="video-stage">
+        <video id="recordVideo" autoplay muted playsinline></video>
+        <canvas id="recordCanvas"></canvas>
+        <div id="countdownOverlay" class="countdown-overlay hidden"><span id="countdownNumber">3</span></div>
+      </div>
+
+      <div class="quality-checklist small">
+        <div id="checkPerson2" class="check-item pending"><span class="dot"></span> One person</div>
+        <div id="checkLight2" class="check-item pending"><span class="dot"></span> Lighting</div>
+        <div id="checkStable2" class="check-item pending"><span class="dot"></span> Steady</div>
+      </div>
+
+      <div class="record-controls">
+        <div id="timerDisplay" class="timer">12.0s</div>
+        <button id="btnRecord" class="record-btn" disabled>Start Recording</button>
+      </div>
+
+      <div id="verifyBanner" class="verify-banner hidden">
+        <p id="verifyMessage"></p>
+      </div>
+
+      <div id="afterRecord" class="after-record hidden">
+        <p id="uploadStatus" class="upload-status"></p>
+        <div class="button-row">
+          <button id="btnRedo" class="secondary">Re-record This Sentence</button>
+          <button id="btnNext" class="primary">Next Sentence</button>
+        </div>
+      </div>
+
+      <p id="recordError" class="error"></p>
+    </section>
+
+    <!-- SCREEN 4: Done -->
+    <section id="screen-done" class="screen">
+      <h1>All done — thank you!</h1>
+      <p class="sub">All 5 recordings have been uploaded successfully. You can close this tab now. Thank you for contributing to CLARUS!</p>
+      <div class="checkmark">&#10003;</div>
+    </section>
+
+  </div>
+
+  <!-- Supabase JS SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+
+  <!-- MediaPipe Face Landmarker (Tasks API, WASM) -->
+  <script type="module" src="face-quality.js"></script>
+
+  <script src="supabase-config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
