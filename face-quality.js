@@ -7,8 +7,12 @@ import { FaceLandmarker, FilesetResolver } from "https://cdn.jsdelivr.net/npm/@m
 
 const LIGHT_THRESHOLD_MIN = 60;   // average brightness (0-255) below this = too dark
 const LIGHT_THRESHOLD_MAX = 235;  // above this = blown out / too bright
-const STABLE_MOVEMENT_PX = 6;     // max allowed nose-tip movement between frames, in pixels
-const STABLE_HISTORY_FRAMES = 8;  // how many recent frames must all be steady
+const STABLE_MOVEMENT_PX = 22;    // max allowed nose-tip movement between frames, in pixels
+                                    // (loosened from 6px -- that was too strict for a
+                                    // handheld phone camera, where natural hand shake
+                                    // alone could exceed it and permanently block "Steady")
+const STABLE_HISTORY_FRAMES = 5;  // how many recent frames must all be steady (was 8 --
+                                    // shortened so a brief stray frame doesn't reset progress)
 
 let landmarker = null;
 let offscreenCanvas = null;
